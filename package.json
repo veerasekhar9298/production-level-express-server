@@ -53,5 +53,14 @@
     "tsc-watch": "^7.2.0",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.2"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   }
 }
