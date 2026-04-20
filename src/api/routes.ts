@@ -1,12 +1,12 @@
-import express, { application } from "express";
-import type { Application, Request, Response, NextFunction } from "express";
-import healthCheckRoutes from "./healthCheckRoutes.js";
-import cors from "cors";
-import bodyParser from "body-parser";
-import { ApolloServer } from "@apollo/server";
-import { setupSwagger } from "../docs/setupSwagger.js";
-import { swaggerAuth } from "../middleware/swaggerAuth.js";
-import { expressMiddleware } from "@as-integrations/express5";
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express5';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import type { Application, Request, Response, NextFunction } from 'express';
+import healthCheckRoutes from './healthCheckRoutes.js';
+import { setupSwagger } from '../docs/setupSwagger.js';
+import { swaggerAuth } from '../middleware/swaggerAuth.js';
 
 const typeDefs = `#graphql
   type Query {
@@ -16,7 +16,7 @@ const typeDefs = `#graphql
 
 const resolvers = {
   Query: {
-    hello: () => "Hello from Express 5 + Apollo v5 🚀",
+    hello: () => 'Hello from Express 5 + Apollo v5 🚀',
   },
 };
 
@@ -28,35 +28,23 @@ const router = async (app: Application) => {
   });
 
   await gqlServer.start();
-  
-  apiRoutes.use("/health-check", healthCheckRoutes);
-  
-  apiRoutes.use('/docs',swaggerAuth)
-  setupSwagger(app)
 
-apiRoutes.use("/graphql", cors(), bodyParser.json(), expressMiddleware(gqlServer));  //   // Mounting V2 routes on api
-  //   apiRoutes.use('/v2', v2Routes);
+  apiRoutes.use('/health-check', healthCheckRoutes);
 
-  //   // Mounting V3 routes on api
-  //   apiRoutes.use('/v3', v3Routes);
+  apiRoutes.use('/docs', swaggerAuth);
+  setupSwagger(app);
 
-  // Mounting Web Integration Routes
-  //   apiRoutes.use('/web-integrations', webIntegrationRoutes);
-
-  //   apiRoutes.use('/shortener', shortenerRoutes);
+  apiRoutes.use('/graphql', cors(), bodyParser.json(), expressMiddleware(gqlServer)); //   // Mounting V2 routes on api
 
   // If no routes matches
   apiRoutes.use((req: Request, res: Response, next: NextFunction) => {
- apiRoutes.use((req: Request, res: Response) => {
-  res.status(404).json({ message: "Route not found" });
-});
+    apiRoutes.use((req: Request, res: Response) => {
+      res.status(404).json({ message: 'Route not found' });
+    });
     return next();
   });
 
-  app.use("/api", apiRoutes);
-
-  // this route is not exposed on the reverse proxy; for internal service use only
-  //   app.use('/simulation-app-api', simulationScriptRoutes);
+  app.use('/api', apiRoutes);
 };
 
 export default router;
