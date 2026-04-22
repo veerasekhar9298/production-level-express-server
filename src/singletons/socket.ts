@@ -4,7 +4,7 @@ interface SocketRequest extends IncomingMessage {
   user?: any;
 }
 // import type { Request, Response, NextFunction } from 'express';
-import createError from 'http-errors';
+// import createError from 'http-errors';
 import ioSessionHandler from 'io-session-handler';
 // import type { Socket, ExtendedError } from 'socket.io';
 import { Server } from 'socket.io';
@@ -54,7 +54,8 @@ frontEndWebsocket.use((socket, next) => {
   if (req.user) {
     next();
   } else {
-    next(createError(401));
+    // next(createError(401));
+    next();
   }
 });
 

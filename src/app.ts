@@ -13,6 +13,7 @@ import expressApp from './expressApp.js';
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
 
+  await import('./singletons/socket.js');
   const exitHandler = async ({
     error,
     cleanup,
@@ -105,7 +106,7 @@ if (cluster.isPrimary) {
   });
 
   // Get the number of express workers from env or default to 1
-  const expressWorkerCount = 1;
+  const expressWorkerCount = env.EXPRESS_WORKERS || 1;
 
   // Spawn a worker for every core.
   for (let j = 0; j < expressWorkerCount; j++) {
