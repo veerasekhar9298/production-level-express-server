@@ -7,8 +7,10 @@ import qs from 'qs';
 // api routes and helpers
 import router from './api/routes.js';
 
-const nodePort = 3000;
-// const wsPort = 8000;
+import env from './config/env.json' with { type: 'json' };
+const { ALLOWED_EXTERNAL_ORIGINS = [], CLIENT_URL, NODE_PORT, WS_PORT } = env;
+const nodePort = NODE_PORT || 3000;
+const wsPort = WS_PORT || 8000;
 
 export default function expressApp() {
   // instantiate the express app
@@ -35,16 +37,16 @@ export default function expressApp() {
 
   // Enable CORS from client-side
   app.use((req, res, next) => {
-    // const allowedOrigins = [`ws://localhost:${wsPort}`];
-    // const { origin } = req.headers;
-    // const allAllowedOrigin = [...allowedOrigins, ...ALLOWED_EXTERNAL_ORIGINS, CLIENT_URL];
-    // if (allAllowedOrigin.includes('*')) {
-    //   res.setHeader('Access-Control-Allow-Origin', '*');
-    // } else if (allAllowedOrigin.includes(origin)) {
-    //   res.setHeader('Access-Control-Allow-Origin', origin);
-    // } else {
-    //   res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
-    // }
+    const allowedOrigins = [`ws://localhost:${wsPort}`];
+    const origin = req.headers.origin ?? '';
+    const allAllowedOrigin = [...allowedOrigins, ...ALLOWED_EXTERNAL_ORIGINS, CLIENT_URL];
+    if (allAllowedOrigin.includes('*')) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    } else if (allAllowedOrigin.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', CLIENT_URL);
+    }
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header(
       'Access-Control-Allow-Headers',
@@ -58,24 +60,16 @@ export default function expressApp() {
   // Parse query strings using qs library
   app.set('query parser', (str: string) => qs.parse(str));
 
-  // setup view engine
-  //   app.set('view engine', 'js');
-  //   app.set('views', path.join(__dirname, '/views'));
-  //   app.engine('js', reactViews);
-
-  //   app.use(express.static(path.join(__dirname, '/views')));
-
-  // add express statsd middleware for api metrics
-  //   app.use(expressStatsd({ client: statsD }));
-
   router(app);
 
   // Error handler
 
-  //   app.use((error, req, res, next) => {
-  //     const status = error.status || 500;
-  //     res.status(status).json(response.error(req, error, 'Something went wrong. Please try again', null));
-  //   });
+  // app.use((error, req, res, next) => {
+  //   const status = error.status || 500;
+  //   res
+  //     .status(status)
+  //     .json(response.error(req, error, 'Something went wrong. Please try again', null));
+  // });
 
   // errorhandler to be the last middleware
   // This handles any errors that Express catches
